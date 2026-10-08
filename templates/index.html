@@ -2,22 +2,38 @@
 <html>
 
 <head>
-  <title>Elokuva sovellus</Elokuva-Sovellus></title>
+    <meta charset="utf-8">
+    <title>Elokuva sovellus</title>
 </head>
 
 <body>
-  <h1>Elokuva sovellus</h1>
-  <p>
-    Hae tai lisää elokuva
-  </p>
+    <div style="text-align: right;">
+        <a href="/login"><button type="button">Kirjaudu sisään</button></a>
+        <a href="/register"><button type="button">Rekisteröidy</button></a>
+    </div>
+    
+    <h1>Elokuva sovellus</h1>
+    <p>
+        Hae tai lisää elokuva
+    </p>
+
+    <a href="/add_movie">Lisää elokuva</a>
+
+    <h2>Elokuvat</h2>
+
+    {% if movies %}
+    <ul>
+        {% for movie in movies %}
+        <li>
+            <strong>{{ movie[1] }}</strong> ({{ movie[2] }})<br>
+            Genre: {{ movie[3] }}<br>
+            {{ movie[4] }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Ei vielä elokuvia.</p>
+    {% endif %}
 </body>
-
-<body>
-  <form action="/add_movie" method="post">
-    <input type="submit" value="Lisää elokuva" />
-  </form>
-</body>
-
-
 
 </html>
