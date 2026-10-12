@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
-
+ 
 <head>
+  <meta charset="utf-8">
   <title>Lisää elokuva</title>
 </head>
-
+ 
 <body>
   <h1>Lisää elokuva</h1>
-  <form action="/add_movie" method="post">
+  <form action="/add_movie" method="post" enctype="multipart/form-data">
     <p>Elokuvan nimi: <br />
       <textarea name="name" rows="1" cols="50"></textarea>
     </p>
@@ -22,10 +23,14 @@
     <p>Kuvaus: <br />
       <textarea name="description" rows="3" cols="50"></textarea>
     </p>
+    <p>Kuva (jpg, enintään 100 kB): <br />
+      <input type="file" name="image" accept=".jpg" />
+    </p>
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Lähetä" />
   </form>
   <p><a href="/">Takaisin etusivulle</a></p>
 </body>
-
+ 
 </html>
+ 

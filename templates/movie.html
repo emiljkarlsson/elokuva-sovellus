@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Elokuva sovellus</title>
+</head>
+
+<body>
+    <div style="text-align: right;">
+        {% if session.username %}
+            Kirjautunut: <strong>{{ session.username }}</strong>
+            <a href="/logout"><button type="button">Kirjaudu ulos</button></a>
+        {% else %}
+            <a href="/login"><button type="button">Kirjaudu sisään</button></a>
+            <a href="/register"><button type="button">Rekisteröidy</button></a>
+        {% endif %}
+    </div>
+
+    <h1>Elokuva sovellus</h1>
+
+</body>
+
+<head>
+    <title>{{ movie[1] }}</title>
+</head>
+
+<body>
+    <h1>{{ movie[1] }}</h1>
+
+    {% if has_image %}
+    <img src="/movie/{{ movie[0] }}/image" alt="{{ movie[1] }}" width="300">
+    {% endif %}
+
+    <p>Vuosi: {{ movie[2] }}</p>
+    <p>Genre: {{ movie[3] }}</p>
+    <p>{{ movie[4] }}</p>
+
+    <p><a href="/">Takaisin etusivulle</a></p>
+</body>
+
+</html>
