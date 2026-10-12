@@ -8,9 +8,14 @@
 
 <body>
     <div style="text-align: right;">
+    {% if session.username %}
+        Kirjautunut: <strong>{{ session.username }}</strong>
+        <a href="/logout"><button type="button">Kirjaudu ulos</button></a>
+    {% else %}
         <a href="/login"><button type="button">Kirjaudu sisään</button></a>
         <a href="/register"><button type="button">Rekisteröidy</button></a>
-    </div>
+    {% endif %}
+</div>
 
     <h1>Elokuva sovellus</h1>
     <p>
@@ -33,7 +38,6 @@
             Genre: {{ movie[3] }}<br>
             {{ movie[4] }}
             <a href="/movie/{{ movie[0] }}"><button type="button">Näytä elokuvan sivu</button></a>
-</li>
         </li>
         {% endfor %}
     </ul>
