@@ -114,6 +114,58 @@ def add():
 
     return render_template("add.html")
 
+@app.route("/edit_movie/<int:movie_id>", methods=["GET", "POST"])
+def edit_movie(movie_id):
+    require_login()
+
+    db = sqlite3.connect("database.db")
+    movie = db.execute(
+        "SELECT * FROM movies WHERE id = ?",
+        [movie_id]
+    ).fetchone()
+    db.close()
+
+    if not movie:
+        abort(404)
+
+    if request.method == "GET":
+        genres = movie[3].split(", ")
+        return render_template("edit.html", movie=movie, genres=genres)
+
+    check_csrf()
+
+    name = request.form["name"]
+    year = request.form["year"]
+    description = request.form["description"]
+    genres = request.form.getlist("genre")
+
+    file = request.files.get("image")
+    image = None
+    if file and file.filename:
+        if not file.filename.lower().endswith(".jpg"):
+            return "VIRHE: väärä tiedostomuoto"
+        image = file.read()
+        if len(image) > 100 * 1024:
+            return "VIRHE: liian suuri kuva"
+
+    db = sqlite3.connect("database.db")
+
+    db.execute(
+        "UPDATE movies SET name = ?, year = ?, genre = ?, description = ? WHERE id = ?",
+        [name, year, ", ".join(genres), description, movie_id]
+    )
+
+    if image:
+        db.execute(
+            "INSERT OR REPLACE INTO movie_images (movie_id, image) VALUES (?, ?)",
+            [movie_id, image]
+        )
+
+    db.commit()
+    db.close()
+
+    return redirect("/movie/" + str(movie_id))
+
 
 @app.route("/movie/<int:movie_id>")
 def movie(movie_id):
@@ -149,6 +201,7 @@ def movie_image(movie_id):
     response = make_response(bytes(result[0]))
     response.headers.set("Content-Type", "image/jpeg")
     return response
+
 
 
 @app.route("/register")

@@ -27,6 +27,12 @@
     <p>Genre: {{ movie[3] }}</p>
     <p>{{ movie[4] }}</p>
 
+    <p>{{ movie[4] }}</p>
+
+    {% if session.username %}
+    <a href="/edit_movie/{{ movie[0] }}"><button type="button">Muokkaa elokuvaa</button></a>
+    {% endif %}
+
     <p><a href="/">Takaisin etusivulle</a></p>
 </body>
 

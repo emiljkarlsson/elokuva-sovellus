@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Muokkaa elokuvaa</title>
+</head>
+
+<body>
+  <h1>Muokkaa elokuvaa</h1>
+  <form action="/edit_movie/{{ movie[0] }}" method="post" enctype="multipart/form-data">
+    <p>Elokuvan nimi: <br />
+      <textarea name="name" rows="1" cols="50">{{ movie[1] }}</textarea>
+    </p>
+    <p>Vuosi: <br />
+      <textarea name="year" rows="1" cols="4">{{ movie[2] }}</textarea>
+    </p>
+    <p>Valitse genre(t):</p>
+    <p>
+      <input type="checkbox" name="genre" value="Draama" {% if "Draama" in genres %}checked{% endif %} /> Draama
+      <input type="checkbox" name="genre" value="Komedia" {% if "Komedia" in genres %}checked{% endif %} /> Komedia
+    </p>
+    <p>Kuvaus: <br />
+      <textarea name="description" rows="3" cols="50">{{ movie[4] }}</textarea>
+    </p>
+    <p>Vaihda kuva (jpg): <br />
+      <input type="file" name="image" accept=".jpg" />
+    </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="submit" value="Tallenna" />
+  </form>
+  <p><a href="/movie/{{ movie[0] }}">Takaisin elokuvan sivulle</a></p>
+</body> 
+
+</html>
