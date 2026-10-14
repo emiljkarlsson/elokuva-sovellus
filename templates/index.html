@@ -8,26 +8,60 @@
 
 <body>
     <div style="text-align: right;">
-    {% if session.username %}
-        Kirjautunut: <strong>{{ session.username }}</strong>
-        <a href="/logout"><button type="button">Kirjaudu ulos</button></a>
-    {% else %}
-        <a href="/login"><button type="button">Kirjaudu sisään</button></a>
-        <a href="/register"><button type="button">Rekisteröidy</button></a>
-    {% endif %}
-</div>
+        {% if session.username %}
+            Kirjautunut: <strong>{{ session.username }}</strong>
+            <a href="/logout"><button type="button">Kirjaudu ulos</button></a>
+        {% else %}
+            <a href="/login"><button type="button">Kirjaudu sisään</button></a>
+            <a href="/register"><button type="button">Rekisteröidy</button></a>
+        {% endif %}
+    </div>
 
     <h1>Elokuva sovellus</h1>
     <p>
         Hae tai lisää elokuva
     </p>
 
+    <form action="/search" method="get">
+        <p>
+            Hakusana:
+            {% if query %}
+            <input type="text" name="query" value="{{ query }}" />
+            {% else %}
+            <input type="text" name="query" />
+            {% endif %}
+        </p>
+        <input type="submit" value="Hae" />
+    </form>
+
     {% if session.username %}
-    <a href="/add_movie">Lisää elokuva</a>
+    <p><a href="/add_movie">Lisää elokuva</a></p>
     {% else %}
     <p>Kirjaudu sisään lisätäksesi elokuvia.</p>
     {% endif %}
 
+    {% if query %}
+    <hr />
+    <h2>Tulokset</h2>
+
+    {% if results %}
+    <ul>
+        {% for movie in results %}
+        <li>
+            <strong>{{ movie[1] }}</strong> ({{ movie[2] }})<br>
+            Genre: {{ movie[3] }}<br>
+            {{ movie[4] }}<br>
+            <a href="/movie/{{ movie[0] }}"><button type="button">Näytä elokuvan sivu</button></a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Ei hakutuloksia.</p>
+    {% endif %}
+
+    <p><a href="/">Näytä kaikki elokuvat</a></p>
+
+    {% else %}
     <h2>Elokuvat</h2>
 
     {% if movies %}
@@ -36,13 +70,14 @@
         <li>
             <strong>{{ movie[1] }}</strong> ({{ movie[2] }})<br>
             Genre: {{ movie[3] }}<br>
-            {{ movie[4] }}
+            {{ movie[4] }}<br>
             <a href="/movie/{{ movie[0] }}"><button type="button">Näytä elokuvan sivu</button></a>
         </li>
         {% endfor %}
     </ul>
     {% else %}
     <p>Ei vielä elokuvia.</p>
+    {% endif %}
     {% endif %}
 </body>
 

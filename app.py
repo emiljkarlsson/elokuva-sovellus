@@ -202,7 +202,37 @@ def movie_image(movie_id):
     response.headers.set("Content-Type", "image/jpeg")
     return response
 
+@app.route("/search")
+def search():
+    query = request.args.get("query")
+    results = []
 
+    if query:
+        like = "%" + query + "%"
+        db = sqlite3.connect("database.db")
+        results = db.execute(
+            """SELECT * FROM movies
+               WHERE name LIKE ? OR genre LIKE ? OR description LIKE ?
+               ORDER BY name""",
+            [like, like, like]
+        ).fetchall()
+        db.close()
+
+    return render_template("index.html", query=query, results=results)
+    results = []
+
+    if query:
+        like = "%" + query + "%"
+        db = sqlite3.connect("database.db")
+        results = db.execute(
+            """SELECT * FROM movies
+               WHERE name LIKE ? OR genre LIKE ? OR description LIKE ?
+               ORDER BY name""",
+            [like, like, like]
+        ).fetchall()
+        db.close()
+
+    return render_template("index.html", query=query, results=results)
 
 @app.route("/register")
 def register():
