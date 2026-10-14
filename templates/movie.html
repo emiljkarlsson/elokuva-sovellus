@@ -27,11 +27,42 @@
     <p>Genre: {{ movie[3] }}</p>
     <p>{{ movie[4] }}</p>
 
-    <p>{{ movie[4] }}</p>
-
     {% if session.username %}
     <a href="/edit_movie/{{ movie[0] }}"><button type="button">Muokkaa elokuvaa</button></a>
     {% endif %}
+
+        {% if session.username %}
+    <h3>Lisää arvostelu</h3>
+    <form action="/movie/{{ movie[0] }}/add_review" method="post">
+        <p>Arvosana (1-10): <br />
+            <input type="number" name="rating" min="1" max="10" required />
+        </p>
+        <p>Arvostelu: <br />
+            <textarea name="comment" rows="4" cols="50" maxlength="1000" required></textarea>
+        </p>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+        <input type="submit" value="Lähetä arvostelu" />
+    </form>
+    {% else %}
+    <p>Kirjaudu sisään lisätäksesi arvostelun.</p>
+    {% endif %}
+
+        <h2>Arvostelut</h2>
+
+    {% if reviews %}
+    <p>Keskiarvo: <strong>{{ average }}</strong> / 10 ({{ reviews | count }} arvostelua)</p>
+    <ul>
+        {% for review in reviews %}
+        <li>
+            <strong>{{ review[3] }}</strong>: {{ review[0] }}/10 ({{ review[2] }})<br>
+            {{ review[1] }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Ei vielä arvosteluja.</p>
+    {% endif %}
+
 
     <p><a href="/">Takaisin etusivulle</a></p>
 </body>

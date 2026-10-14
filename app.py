@@ -54,7 +54,7 @@ db.execute("""
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         movie_id INTEGER NOT NULL REFERENCES movies(id),
         user_id INTEGER NOT NULL REFERENCES users(id),
-        rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+        rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 10),
         comment TEXT NOT NULL,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
@@ -113,6 +113,37 @@ def add():
         return redirect("/")
 
     return render_template("add.html")
+
+@app.route("/movie/<int:movie_id>/add_review", methods=["POST"])
+def add_review(movie_id):
+    require_login()
+    check_csrf()
+
+    rating = request.form["rating"]
+    comment = request.form["comment"].strip()
+
+    if not rating.isdigit() or not 1 <= int(rating) <= 10:
+        return "VIRHE: arvosanan pitää olla luku 1-10"
+    if not comment or len(comment) > 1000:
+        return "VIRHE: arvostelun pituus pitää olla 1-1000 merkkiä"
+
+    db = sqlite3.connect("database.db")
+    movie = db.execute(
+        "SELECT 1 FROM movies WHERE id = ?",
+        [movie_id]
+    ).fetchone()
+    if not movie:
+        db.close()
+        abort(404)
+
+    db.execute(
+        "INSERT INTO reviews (movie_id, user_id, rating, comment) VALUES (?, ?, ?, ?)",
+        [movie_id, session["user_id"], int(rating), comment]
+    )
+    db.commit()
+    db.close()
+
+    return redirect("/movie/" + str(movie_id))
 
 @app.route("/edit_movie/<int:movie_id>", methods=["GET", "POST"])
 def edit_movie(movie_id):
@@ -178,12 +209,24 @@ def movie(movie_id):
         "SELECT 1 FROM movie_images WHERE movie_id = ?",
         [movie_id]
     ).fetchone() is not None
+    reviews = db.execute(
+        """SELECT r.rating, r.comment, r.created_at, u.username
+           FROM reviews r, users u
+           WHERE r.user_id = u.id AND r.movie_id = ?
+           ORDER BY r.created_at DESC""",
+        [movie_id]
+    ).fetchall()
     db.close()
 
     if not movie:
         abort(404)
 
-    return render_template("movie.html", movie=movie, has_image=has_image)
+    average = None
+    if reviews:
+        average = round(sum(r[0] for r in reviews) / len(reviews), 1)
+
+    return render_template("movie.html", movie=movie, has_image=has_image,
+                           reviews=reviews, average=average)
 
 
 @app.route("/movie/<int:movie_id>/image")
@@ -219,21 +262,7 @@ def search():
         db.close()
 
     return render_template("index.html", query=query, results=results)
-    results = []
-
-    if query:
-        like = "%" + query + "%"
-        db = sqlite3.connect("database.db")
-        results = db.execute(
-            """SELECT * FROM movies
-               WHERE name LIKE ? OR genre LIKE ? OR description LIKE ?
-               ORDER BY name""",
-            [like, like, like]
-        ).fetchall()
-        db.close()
-
-    return render_template("index.html", query=query, results=results)
-
+    
 @app.route("/register")
 def register():
     return render_template("register.html")
